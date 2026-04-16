@@ -79,3 +79,42 @@ This section has moved here: [https://facebook.github.io/create-react-app/docs/t
  --> -->
 # Zerodha-Clone
 # Zerodha-Clone
+
+## Backend
+
+The backend is built with Node.js and Express.js, using MongoDB for data storage via Mongoose.
+
+### Prerequisites
+
+- Node.js (version 14 or higher)
+- MongoDB (running locally or a MongoDB Atlas connection)
+
+### Installation and Setup
+
+1. Navigate to the backend directory:
+   ```
+   cd backend
+   ```
+
+2. Install dependencies:
+   ```
+   npm install
+   ```
+
+3. Create a `.env` file in the backend directory with the following variables:
+   ```
+   MONGO_URL=your_mongodb_connection_string
+   PORT=5600  # Optional, defaults to 5600
+   ```
+
+4. Start the development server:
+   ```
+   npm start
+   ```
+
+The server will start on port 5600 (or the port specified in .env), and you'll see "database connected successfully" and "server started!" in the console.
+
+### API Endpoints
+
+- The backend provides RESTful APIs for holdings, orders, and positions.
+- Refer to the routes and controllers in the `src/` directory for details.
