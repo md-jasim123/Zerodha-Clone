@@ -47,8 +47,19 @@ if(!allHoldings) return next(new ApiError(404,"holdings data not found"))
 
 
 
+export const allOrders = asyncHandler(
+  async (req, res, next) => {
+    let allOrders = await OrdersModel.find({});
 
+    if(allOrders.length == 0) return next(new ApiError(404, "order data not found"));
 
+    res.status(200).json({
+      allOrders,
+      message: "Order data fetched successfully",
+      success: true
+    });
+  }
+)
 
 export const newOrder = asyncHandler(
    async (req, res) => {
