@@ -7,30 +7,28 @@ import { TableSkeleton } from "./Loader";
 
 const Holdings = () => {
   const [allHoldings, setAllHoldings] = useState([]);
-  const [loading, setLoading] = useState(true);
 
-  useEffect(() => {
-    setLoading(true);
-    axios
-      .get("http://localhost:3002/allHoldings")
-      .then((res) => {
-        setAllHoldings(res.data);
-      })
-      .catch(() => {
-        setAllHoldings([]);
-      })
-      .finally(() => setLoading(false));
   }, []);
 
+  const filteredHoldings = allHoldings.filter((stock) => {
+    const matchesSearch = stock.name.toLowerCase().includes(searchQuery.toLowerCase());
+    const curValue = stock.price * stock.qty;
+    const isProfit = curValue - stock.avg * stock.qty >= 0.0;
+    
+    if (filterType === "Profit") return matchesSearch && isProfit;
+    if (filterType === "Loss") return matchesSearch && !isProfit;
+    return matchesSearch;
+  });
+
   // const labels = ['January', 'February', 'March', 'April', 'May', 'June', 'July'];
-  const labels = allHoldings.map((subArray) => subArray["name"]);
+  const labels = filteredHoldings.map((subArray) => subArray["name"]);
 
   const data = {
     labels,
     datasets: [
       {
         label: "Stock Price",
-        data: allHoldings.map((stock) => stock.price),
+        data: filteredHoldings.map((stock) => stock.price),
         backgroundColor: "rgba(255, 99, 132, 0.5)",
       },
     ],
@@ -54,7 +52,26 @@ const Holdings = () => {
 
   return (
     <>
-      <h3 className="title">Holdings ({allHoldings.length})</h3>
+      <h3 className="title">Holdings ({filteredHoldings.length})</h3>
+
+      <div className="filters" style={{ display: 'flex', gap: '20px', marginBottom: '20px' }}>
+        <input 
+          type="text" 
+          placeholder="Search instrument..." 
+          value={searchQuery}
+          onChange={(e) => setSearchQuery(e.target.value)}
+          style={{ padding: '8px', borderRadius: '4px', border: '1px solid #ccc', flex: 1 }}
+        />
+        <select 
+          value={filterType} 
+          onChange={(e) => setFilterType(e.target.value)}
+          style={{ padding: '8px', borderRadius: '4px', border: '1px solid #ccc' }}
+        >
+          <option value="All">All</option>
+          <option value="Profit">Profit Only</option>
+          <option value="Loss">Loss Only</option>
+        </select>
+      </div>
 
       {loading ? (
         <TableSkeleton rows={5} cols={8} />
@@ -73,11 +90,7 @@ const Holdings = () => {
                 <th>Day chg.</th>
               </tr>
 
-              {allHoldings.map((stock, index) => {
-                const curValue = stock.price * stock.qty;
-                const isProfit = curValue - stock.avg * stock.qty >= 0.0;
-                const profClass = isProfit ? "profit" : "loss";
-                const dayClass = stock.isLoss ? "loss" : "profit";
+
 
                 return (
                   <tr key={index}>
